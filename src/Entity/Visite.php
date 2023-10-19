@@ -3,10 +3,16 @@
 namespace App\Entity;
 
 use App\Repository\VisiteRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: VisiteRepository::class)]
 class Visite
@@ -23,7 +29,7 @@ class Visite
     private ?string $pays = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $datecreation = null;
+    private ?DateTimeInterface $datecreation = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $note = null;
@@ -39,7 +45,7 @@ class Visite
 
     #[ORM\ManyToMany(targetEntity: Environnement::class)]
     private Collection $environnements;
-
+    
     public function __construct()
     {
         $this->environnements = new ArrayCollection();
@@ -74,7 +80,7 @@ class Visite
         return $this;
     }
 
-    public function getDatecreation(): ?\DateTimeInterface
+    public function getDatecreation(): ?DateTimeInterface
     {
         return $this->datecreation;
     }
@@ -87,7 +93,7 @@ class Visite
         }
     }
 
-    public function setDatecreation(?\DateTimeInterface $datecreation): static
+    public function setDatecreation(?DateTimeInterface $datecreation): static
     {
         $this->datecreation = $datecreation;
 
@@ -166,3 +172,6 @@ class Visite
         return $this;
     }
 }
+
+
+
