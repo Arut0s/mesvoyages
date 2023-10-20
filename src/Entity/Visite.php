@@ -15,11 +15,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-
 #[ORM\Entity(repositoryClass: VisiteRepository::class)]
 #[Vich\Uploadable]
-class Visite
-{
+class Visite {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -48,132 +47,119 @@ class Visite
 
     #[ORM\ManyToMany(targetEntity: Environnement::class)]
     private Collection $environnements;
-    
+
     // NOTE: This is not a mapped field of entity metadata, just a simple property.
     #[Vich\UploadableField(mapping: 'visites', fileNameProperty: 'imageName')]
+
     private ?File $imageFile = null;
 
-    #[ORM\Column(type:"string", nullable: true)]
+    #[ORM\Column(type: "string", nullable: true)]
     private ?string $imageName = null;
-    
-    public function setImageFile(?File $imageFile = null): void
-    {
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updated_at = null;
+
+    public function setImageFile(?File $imageFile = null): self {
         $this->imageFile = $imageFile;
-        
+        if ($this->imageFile instanceof UploadedFile) {
+            $this->updated_at = new \DateTime('now');
+        }
+        return $this;
     }
 
-    public function getImageFile(): ?File
-    {
+    public function getImageFile(): ?File {
         return $this->imageFile;
     }
 
-    public function setImageName(?string $imageName): void
-    {
+    public function setImageName(?string $imageName): void {
         $this->imageName = $imageName;
     }
 
-    public function getImageName(): ?string
-    {
+    public function getImageName(): ?string {
         return $this->imageName;
     }
-    
-    public function __construct()
-    {
+
+    public function __construct() {
         $this->environnements = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
+    public function getId(): ?int {
         return $this->id;
     }
 
-    public function getVille(): ?string
-    {
+    public function getVille(): ?string {
         return $this->ville;
     }
 
-    public function setVille(string $ville): static
-    {
+    public function setVille(string $ville): static {
         $this->ville = $ville;
 
         return $this;
     }
 
-    public function getPays(): ?string
-    {
+    public function getPays(): ?string {
         return $this->pays;
     }
 
-    public function setPays(string $pays): static
-    {
+    public function setPays(string $pays): static {
         $this->pays = $pays;
 
         return $this;
     }
 
-    public function getDatecreation(): ?DateTimeInterface
-    {
+    public function getDatecreation(): ?DateTimeInterface {
         return $this->datecreation;
     }
-    
-    public function getDatecreationString():string{
-        if($this->datecreation==null){
+
+    public function getDatecreationString(): string {
+        if ($this->datecreation == null) {
             return "";
-        }else{
+        } else {
             return $this->datecreation->format('d/m/Y');
         }
     }
 
-    public function setDatecreation(?DateTimeInterface $datecreation): static
-    {
+    public function setDatecreation(?DateTimeInterface $datecreation): static {
         $this->datecreation = $datecreation;
 
         return $this;
     }
 
-    public function getNote(): ?int
-    {
+    public function getNote(): ?int {
         return $this->note;
     }
 
-    public function setNote(?int $note): static
-    {
+    public function setNote(?int $note): static {
         $this->note = $note;
 
         return $this;
     }
 
-    public function getAvis(): ?string
-    {
+    public function getAvis(): ?string {
         return $this->avis;
     }
 
-    public function setAvis(?string $avis): static
-    {
+    public function setAvis(?string $avis): static {
         $this->avis = $avis;
 
         return $this;
     }
 
-    public function getTempmin(): ?int
-    {
+    public function getTempmin(): ?int {
         return $this->tempmin;
     }
 
-    public function setTempmin(?int $tempmin): static
-    {
+    public function setTempmin(?int $tempmin): static {
         $this->tempmin = $tempmin;
 
         return $this;
     }
 
-    public function getTempmax(): ?int
-    {
+    public function getTempmax(): ?int {
         return $this->tempmax;
     }
 
-    public function setTempmax(?int $tempmax): static
-    {
+    public function setTempmax(?int $tempmax): static {
         $this->tempmax = $tempmax;
 
         return $this;
@@ -182,13 +168,11 @@ class Visite
     /**
      * @return Collection<int, Environnement>
      */
-    public function getEnvironnements(): Collection
-    {
+    public function getEnvironnements(): Collection {
         return $this->environnements;
     }
 
-    public function addEnvironnement(Environnement $environnement): static
-    {
+    public function addEnvironnement(Environnement $environnement): static {
         if (!$this->environnements->contains($environnement)) {
             $this->environnements->add($environnement);
         }
@@ -196,13 +180,41 @@ class Visite
         return $this;
     }
 
-    public function removeEnvironnement(Environnement $environnement): static
-    {
+    public function removeEnvironnement(Environnement $environnement): static {
         $this->environnements->removeElement($environnement);
 
         return $this;
     }
+
+    public function getUpdatedAt(): ?\DateTimeInterface {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updated_at): static {
+        $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * @Assert\Callback
+     * @param ExecutionContextInterface $context
+     */
+    public function validate(ExecutionContextInterface $context) {
+        $image = $this->getImageFile();
+        if ($image != null && $image != "") {
+            $tailleImage = @getimagesize($image);
+            if (!($tailleImage == false)) {
+                if ($tailleImage[0] > 1300 || $tailleImage[1] > 1300) {
+                    $context->buildViolation("Cette image est trop grande (1300x1300 max)")
+                            ->atPath('imageFile')
+                            ->addViolation();
+                }
+            }else{
+                $context->buildViolation("Ce n'est pas une image")
+                        ->atPath('imageFile')
+                        ->addViolation();
+            }
+        }
+    }
 }
-
-
-
