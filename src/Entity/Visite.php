@@ -33,6 +33,10 @@ class Visite {
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?DateTimeInterface $datecreation = null;
 
+     #[Assert\Range(
+        min: 0,
+        max: 20,
+    )]
     #[ORM\Column(nullable: true)]
     private ?int $note = null;
 
@@ -42,6 +46,7 @@ class Visite {
     #[ORM\Column(nullable: true)]
     private ?int $tempmin = null;
 
+    #[Assert\GreaterThan(propertyPath:"tempmin")]
     #[ORM\Column(nullable: true)]
     private ?int $tempmax = null;
 
