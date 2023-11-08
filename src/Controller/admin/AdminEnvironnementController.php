@@ -42,10 +42,11 @@ class AdminEnvironnementController extends AbstractController {
 
     /**
      * @Route("/admin/environnement/suppr/{id}", name="admin.environnement.suppr")
-     * @param Environnement $environnement
+     * @param $id
      * @return Response
      */
-    public function suppr(Environnement $environnement): Response{
+    public function suppr($id): Response{
+        $environnement = $this->repository->find($id);
         $this->repository->remove($environnement, true);
         return $this->redirectToRoute('admin.environnements');
     }

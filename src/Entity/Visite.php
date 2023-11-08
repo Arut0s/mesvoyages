@@ -30,6 +30,7 @@ class Visite {
     #[ORM\Column(length: 50)]
     private ?string $pays = null;
 
+    #[Assert\LessThanOrEqual('now')]
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?DateTimeInterface $datecreation = null;
 
