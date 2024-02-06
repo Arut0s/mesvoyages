@@ -10,6 +10,8 @@
             <tr>
                 <th>
                     Ville
+                    <a href="{{ path ('admin.voyages.sort', {champ:'ville', ordre:'ASC'}) }}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true"><</a>
+                    <a href="{{ path ('admin.voyages.sort', {champ:'ville', ordre:'DESC'}) }}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">></a>
                 </th>
                 <th>
                     Pays

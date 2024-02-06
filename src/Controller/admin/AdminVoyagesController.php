@@ -85,6 +85,19 @@ class AdminVoyagesController extends AbstractController {
                     'formvisite' => $formVisite->createView()
         ]);
     }
+    
+    /**
+     * @Route("admin/sort/{champ}/{ordre}", name="admin.voyages.sort")
+     * @param type $champ
+     * @param type $ordre
+     * @return Response
+     */
+      public function sort($champ, $ordre):Response{
+        $visites = $this->repository->findAllOrderBy($champ, $ordre);
+        return $this->render("admin/admin.voyages.html.twig", [
+            'visites' => $visites
+        ]);
+    }
 
     public function __construct(VisiteRepository $repository) {
         $this->repository = $repository;
